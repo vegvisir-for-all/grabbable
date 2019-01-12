@@ -1,0 +1,26 @@
+sudo: required
+dist: trusty
+language: php
+php:
+  - "7.0"
+  - "7.1"
+  - "7.2"
+
+services:
+  - docker
+
+install:
+  - docker version
+  - sudo pip install docker-compose
+  - docker-compose version
+  - cat Dockerfile
+  - docker-compose build --build-arg PHP_VERSION=${TRAVIS_PHP_VERSION}
+
+script:
+  - mkdir -p build/logs
+  - docker-compose up --exit-code-from php
+
+after_script:
+  - mv build/logs/coverage.xml build/logs/coverage.xml.bak
+  - sed 's#/code/##g' build/logs/coverage.xml.bak > build/logs/coverage.xml
+  - php vendor/bin/php-coveralls -v

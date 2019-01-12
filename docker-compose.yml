@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+
+    mysql:
+        container_name: mysql_grown
+        image: mysql:5.7
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: grown
+            MYSQL_DATABASE: grown
+            MYSQL_USER: grown
+            MYSQL_PASSWORD: grown
+
+    mongodb:
+        container_name: mongodb_grown
+        image: mongo
+        logging:
+            driver: none
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: grown
+            MONGO_INITDB_ROOT_PASSWORD: grown
+            MONGO_INITDB_DATABASE: grown
+
+    php:
+        container_name: php_grown
+        build:
+            context: .
+            dockerfile: ./Dockerfile
+        volumes:
+            - .:/code
+        working_dir: /code
+        command: bash -c "composer update --prefer-source --no-interaction && php ./vendor/bin/phpunit --coverage-text --verbose"
+        depends_on:
+            - mysql
